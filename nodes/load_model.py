@@ -4,8 +4,6 @@ import logging
 import os
 from pathlib import Path
 
-import comfy.model_management as mm
-
 log = logging.getLogger("sam3dobjects")
 
 try:
@@ -101,6 +99,8 @@ class LoadSAM3DModel:
         **kwargs,
     ):
         log.info("Loading SAM3D model...")
+
+        import comfy.model_management as mm
 
         # Resolve precision "auto" using GPU capabilities
         # Prefer bf16 (better dynamic range, native on Ampere+), fall back to fp16/fp32.
