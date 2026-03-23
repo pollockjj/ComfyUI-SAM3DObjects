@@ -9,11 +9,11 @@ Sparse/varlen attention: comfy.attention_sparse.dispatch_varlen_attention
 from typing import *
 from enum import Enum
 import math
+from functools import lru_cache
 import torch
 import torch.nn.functional as F
 
 from comfy.ldm.modules.attention import optimized_attention_for_device
-from comfy.attention_sparse import dispatch_varlen_attention
 
 from .sparse import SparseTensor, DEBUG
 
@@ -26,6 +26,13 @@ __all__ = [
     "SerializeMode",
     "SerializeModes",
 ]
+
+
+@lru_cache(maxsize=1)
+def _get_varlen_attention_dispatch():
+    from comfy_sparse_attn import dispatch_varlen_attention
+
+    return dispatch_varlen_attention
 
 
 # ==========================================================================
@@ -226,7 +233,7 @@ def sparse_scaled_dot_product_attention(*args, **kwargs):
         .int()
         .to(device)
     )
-    out = dispatch_varlen_attention(
+    out = _get_varlen_attention_dispatch()(
         q, k, v, cu_seqlens_q, cu_seqlens_kv,
         max(q_seqlen), max(kv_seqlen),
     )
@@ -422,7 +429,7 @@ def sparse_serialized_scaled_dot_product_self_attention(
             .to(qkv.device)
             .int()
         )
-        out = dispatch_varlen_attention(
+        out = _get_varlen_attention_dispatch()(
             q, k, v, cu_seqlens, cu_seqlens, max(seq_lens), max(seq_lens),
         )
 
@@ -554,7 +561,7 @@ def sparse_windowed_scaled_dot_product_self_attention(
             .to(qkv.device)
             .int()
         )
-        out = dispatch_varlen_attention(
+        out = _get_varlen_attention_dispatch()(
             q, k, v, cu_seqlens, cu_seqlens, max(seq_lens), max(seq_lens),
         )
 

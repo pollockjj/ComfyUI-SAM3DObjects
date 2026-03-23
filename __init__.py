@@ -1,12 +1,24 @@
-import logging
-import sys
+"""ComfyUI-SAM3DObjects root module."""
 
-log = logging.getLogger("sam3dobjects")
+from __future__ import annotations
 
-log.info("loading...")
-from comfy_env import register_nodes
-log.info("calling register_nodes")
-NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS = register_nodes()
+from pathlib import Path
+
+from .nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS
 
 WEB_DIRECTORY = "./web"
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
+
+
+def _PRESTARTUP_WEB_COPY(web_dir_path: str) -> None:
+    """Recreate the old comfy_env viewer copy inside the child process."""
+    from comfy_3d_viewers import copy_viewer
+
+    copy_viewer("pointcloud_vtk", Path(web_dir_path))
+
+
+__all__ = [
+    "NODE_CLASS_MAPPINGS",
+    "NODE_DISPLAY_NAME_MAPPINGS",
+    "WEB_DIRECTORY",
+    "_PRESTARTUP_WEB_COPY",
+]

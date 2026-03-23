@@ -1,16 +1,32 @@
-"""ComfyUI-SAM3DObjects Prestartup Script."""
+"""Host-safe prestartup hook for SAM3DObjects.
+
+The original upstream hook used ``comfy_env`` to provision the environment and
+copy runtime assets. For pyisolate conversion we keep only the host-safe asset
+copy into ``ComfyUI/input`` here and defer viewer population to the child-side
+web-copy hook declared in ``__init__.py``.
+"""
+
+from __future__ import annotations
 
 from pathlib import Path
-from comfy_env import setup_env, copy_files
-from comfy_3d_viewers import copy_viewer
+import folder_paths
 
-setup_env()
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-COMFYUI_DIR = SCRIPT_DIR.parent.parent
+def _copy_assets_best_effort() -> None:
+    script_dir = Path(__file__).resolve().parent
+    src_root = script_dir / "assets"
+    dst_root = Path(folder_paths.get_input_directory())
+    if not src_root.exists():
+        return
+    dst_root.mkdir(parents=True, exist_ok=True)
+    for src in src_root.rglob("*"):
+        if not src.is_file():
+            continue
+        rel = src.relative_to(src_root)
+        dst = dst_root / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.exists():
+            dst.write_bytes(src.read_bytes())
 
-# Copy VTK viewer for point cloud preview
-copy_viewer("pointcloud_vtk", SCRIPT_DIR / "web")
 
-# Copy assets
-copy_files(SCRIPT_DIR / "assets", COMFYUI_DIR / "input")
+_copy_assets_best_effort()

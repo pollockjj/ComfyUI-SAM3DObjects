@@ -1,4 +1,2 @@
-# Process isolation for ComfyUI nodes
-comfy-env==0.2.18
-comfy-3d-viewers==0.2.33
-comfy-sparse-attn==0.0.4
+# Legacy requirements retained for reference only.
+# Runtime dependencies now live in pyproject.toml.

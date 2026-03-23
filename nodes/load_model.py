@@ -66,7 +66,7 @@ class LoadSAM3DModel:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "attn_backend": (["auto", "flash_attn", "sdpa", "xformers", "torch_flash_attn"], {
+                "attn_backend": (["auto", "flash_attn", "sdpa", "xformers"], {
                     "default": "auto",
                     "tooltip": "Deprecated - attention is now auto-detected by ComfyUI. This setting has no effect."
                 }),
