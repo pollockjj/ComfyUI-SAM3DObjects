@@ -156,7 +156,7 @@ class SAM3DSceneGenerate:
 
         import folder_paths
         from .utils.stages import run_stage1, run_stage2, run_decode, run_texture_bake_direct
-        from .utils.helpers import ensure_decoder_files
+        from .utils.helpers import coerce_pointmap_tensor, ensure_decoder_files
 
         # Get batch size from mask tensor [N, H, W]
         if len(masks.shape) == 3:
@@ -201,6 +201,8 @@ class SAM3DSceneGenerate:
         if add_textures:
             gs_config = slat_decoder_gs["config_path"]
             ensure_decoder_files(gs_config, "gaussian")
+
+        pointmap = coerce_pointmap_tensor(pointmap)
 
         # Save pointmap once (shared across all objects)
         pointmap_path = os.path.join(base_output_dir, "pointmap.pt")

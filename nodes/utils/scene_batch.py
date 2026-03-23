@@ -273,11 +273,9 @@ def _run_phase1_stage1(
                 alpha = alpha[:, :, np.newaxis]
             image_np = np.concatenate([image_np, alpha], axis=-1)
 
-        # Convert pointmap to tensor
-        if isinstance(pointmap, np.ndarray):
-            pointmap_tensor = torch.from_numpy(pointmap).float()
-        else:
-            pointmap_tensor = pointmap
+        from .helpers import coerce_pointmap_tensor
+
+        pointmap_tensor = coerce_pointmap_tensor(pointmap)
 
         # Preprocess
         ss_input_dict = preprocess_image_lazy(image_np, mask_np, ss_preprocessor, pointmap=pointmap_tensor)

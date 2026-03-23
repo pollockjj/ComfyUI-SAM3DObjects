@@ -48,6 +48,17 @@ def load_pointmap_from_file(pointmap_path: str) -> torch.Tensor:
     return pointmap
 
 
+def coerce_pointmap_tensor(pointmap: Any) -> torch.Tensor:
+    """Accept a pointmap path, numpy array, or tensor and return a device tensor."""
+    if isinstance(pointmap, (str, Path)):
+        return load_pointmap_from_file(str(pointmap))
+    if isinstance(pointmap, np.ndarray):
+        import comfy.model_management as mm
+
+        return torch.from_numpy(pointmap).float().to(mm.get_torch_device())
+    return pointmap
+
+
 def preprocess_image_lazy(
     image_np: np.ndarray,
     mask_np: Optional[np.ndarray],
@@ -292,4 +303,3 @@ def _download_decoder_files(checkpoint_dir: Path, files: list):
             raise RuntimeError(f"Failed to download {filename}: {e}") from e
 
     log.info("Download complete")
-

@@ -177,6 +177,7 @@ class SAM3DGenerateSLAT:
 
         import folder_paths
         import comfy.model_management as mm
+        from .utils.helpers import coerce_pointmap_tensor
         from .utils.stages import run_stage1, run_stage2
 
         log.info("GenerateSLAT: Starting SLAT generation...")
@@ -200,7 +201,7 @@ class SAM3DGenerateSLAT:
 
         # Move pointmap to device
         device = mm.get_torch_device()
-        pointmap = pointmap.to(device)
+        pointmap = coerce_pointmap_tensor(pointmap).to(device)
         log.info("Pointmap shape: %s", pointmap.shape)
 
         # Get config path from generator model

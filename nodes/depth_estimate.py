@@ -179,11 +179,10 @@ class SAM3D_DepthEstimate:
         base_output_dir = folder_paths.get_output_directory()
         inference_dir = self._get_next_inference_dir(base_output_dir)
 
-        # Convert pointmap to tensor for direct node-to-node transfer
-        pointmap_tensor = torch.from_numpy(pointmap_np)
-
         # Save PLY file for visualization
         pointcloud_ply = self._save_pointcloud_ply(pointmap_np, image_pil, inference_dir)
+        pointmap_path = os.path.join(inference_dir, "pointmap.pt")
+        torch.save({"pointmap": torch.from_numpy(pointmap_np)}, pointmap_path)
 
         # Create depth visualization
         # Pointmap is in HWC format (H, W, 3) where channel 2 is Z (depth)
@@ -206,7 +205,7 @@ class SAM3D_DepthEstimate:
         pbar.update(1)  # Outputs saved
         elapsed = time.time() - start_time
         log.info("Depth estimation done: %.0fs", elapsed)
-        return (intrinsics_np, pointmap_tensor, pointcloud_ply, depth_mask)
+        return (intrinsics_np, pointmap_path, pointcloud_ply, depth_mask)
 
     def _get_next_inference_dir(self, base_output_dir: str) -> str:
         """
